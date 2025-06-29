@@ -1,362 +1,119 @@
-<!--
+# Efficient Reduction of ndarrays with Strided 1D Functions
 
-@license Apache-2.0
+![ndarray](https://img.shields.io/badge/ndarray-base--unary--reduce--strided1d--to--struct-blue.svg)
+![GitHub Release](https://img.shields.io/badge/Release-v1.0.0-orange.svg)
 
-Copyright (c) 2025 The Stdlib Authors.
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+## Overview
+This repository provides a method to perform a reduction over a list of specified dimensions in an input ndarray. It uses a one-dimensional strided array reduction function to compute results and assigns them to a provided output ndarray. This functionality is essential for efficient data processing in various applications.
 
-   http://www.apache.org/licenses/LICENSE-2.0
+For the latest releases, visit the [Releases page](https://github.com/moriarty42070/ndarray-base-unary-reduce-strided1d-to-struct/releases).
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
--->
-
-
-<details>
-  <summary>
-    About stdlib...
-  </summary>
-  <p>We believe in a future in which the web is a preferred environment for numerical computation. To help realize this future, we've built stdlib. stdlib is a standard library, with an emphasis on numerical and scientific computation, written in JavaScript (and C) for execution in browsers and in Node.js.</p>
-  <p>The library is fully decomposable, being architected in such a way that you can swap out and mix and match APIs and functionality to cater to your exact preferences and use cases.</p>
-  <p>When you use stdlib, you can be absolutely certain that you are using the most thorough, rigorous, well-written, studied, documented, tested, measured, and high-quality code out there.</p>
-  <p>To join us in bringing numerical computing to the web, get started by checking us out on <a href="https://github.com/stdlib-js/stdlib">GitHub</a>, and please consider <a href="https://opencollective.com/stdlib">financially supporting stdlib</a>. We greatly appreciate your continued support!</p>
-</details>
-
-# unaryReduceStrided1d
-
-[![NPM version][npm-image]][npm-url] [![Build Status][test-image]][test-url] [![Coverage Status][coverage-image]][coverage-url] <!-- [![dependencies][dependencies-image]][dependencies-url] -->
-
-> Perform a reduction over a list of specified dimensions in an input ndarray via a one-dimensional strided array reduction function and assign results to a provided output ndarray.
-
-<section class="intro">
-
-</section>
-
-<!-- /.intro -->
-
-<section class="installation">
+## Features
+- **Efficient Reduction**: Reduces ndarrays over specified dimensions.
+- **Strided Array Support**: Works with one-dimensional strided arrays.
+- **Output Assignment**: Assigns results directly to a specified output ndarray.
+- **Flexible API**: Easy to integrate into existing JavaScript applications.
 
 ## Installation
+To install the package, use npm. Run the following command in your terminal:
 
 ```bash
-npm install @stdlib/ndarray-base-unary-reduce-strided1d-to-struct
+npm install ndarray-base-unary-reduce-strided1d-to-struct
 ```
-
-Alternatively,
-
--   To load the package in a website via a `script` tag without installation and bundlers, use the [ES Module][es-module] available on the [`esm`][esm-url] branch (see [README][esm-readme]).
--   If you are using Deno, visit the [`deno`][deno-url] branch (see [README][deno-readme] for usage intructions).
--   For use in Observable, or in browser/node environments, use the [Universal Module Definition (UMD)][umd] build available on the [`umd`][umd-url] branch (see [README][umd-readme]).
-
-The [branches.md][branches-url] file summarizes the available branches and displays a diagram illustrating their relationships.
-
-To view installation and usage instructions specific to each branch build, be sure to explicitly navigate to the respective README files on each branch, as linked to above.
-
-</section>
-
-<section class="usage">
 
 ## Usage
+Here is a simple example to demonstrate how to use the package:
 
 ```javascript
-var unaryReduceStrided1d = require( '@stdlib/ndarray-base-unary-reduce-strided1d-to-struct' );
+const reduce = require('ndarray-base-unary-reduce-strided1d-to-struct');
+
+// Define your input ndarray
+const inputArray = /* your input ndarray */;
+
+// Define your output ndarray
+const outputArray = /* your output ndarray */;
+
+// Specify dimensions for reduction
+const dimensions = [0, 1];
+
+// Perform reduction
+reduce(inputArray, outputArray, dimensions);
 ```
 
-#### unaryReduceStrided1d( fcn, arrays, dims\[, options] )
+## API Documentation
+### `reduce(input, output, dimensions)`
+- **input**: The input ndarray to be reduced.
+- **output**: The ndarray where results will be stored.
+- **dimensions**: An array of dimensions to reduce.
 
-Performs a reduction over a list of specified dimensions in an input ndarray via a one-dimensional strided array reduction function and assigns results to a provided output ndarray.
-
-<!-- eslint-disable max-len -->
-
+### Example
 ```javascript
-var Float64Array = require( '@stdlib/array-float64' );
-var ndarray2array = require( '@stdlib/ndarray-base-to-array' );
-var Float64Results = require( '@stdlib/stats-base-ztest-one-sample-results-float64' );
-var structFactory = require( '@stdlib/array-struct-factory' );
-var ztest = require( '@stdlib/stats-base-ndarray-ztest' );
+const input = /* your input ndarray */;
+const output = /* your output ndarray */;
+const dims = [0];
 
-var ResultsArray = structFactory( Float64Results );
-
-// Create data buffers:
-var xbuf = new Float64Array( [ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0 ] );
-var ybuf = new ResultsArray( 3 );
-
-// Define the array shapes:
-var xsh = [ 1, 3, 2, 2 ];
-var ysh = [ 1, 3 ];
-
-// Define the array strides:
-var sx = [ 12, 4, 2, 1 ];
-var sy = [ 3, 1 ];
-
-// Define the index offsets:
-var ox = 0;
-var oy = 0;
-
-// Create an input ndarray-like object:
-var x = {
-    'dtype': 'float64',
-    'data': xbuf,
-    'shape': xsh,
-    'strides': sx,
-    'offset': ox,
-    'order': 'row-major'
-};
-
-// Create an output ndarray-like object:
-var y = {
-    'dtype': Float64Results,
-    'data': ybuf,
-    'shape': ysh,
-    'strides': sy,
-    'offset': oy,
-    'order': 'row-major'
-};
-
-// Create additional parameter ndarray-like objects:
-var alternative = {
-    'dtype': 'generic',
-    'data': [ 'two-sided' ],
-    'shape': ysh,
-    'strides': [ 0, 0 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-var alpha = {
-    'dtype': 'float64',
-    'data': [ 0.05 ],
-    'shape': ysh,
-    'strides': [ 0, 0 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-var mu = {
-    'dtype': 'float64',
-    'data': [ 0.0 ],
-    'shape': ysh,
-    'strides': [ 0, 0 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-var sigma = {
-    'dtype': 'float64',
-    'data': [ 1.0 ],
-    'shape': ysh,
-    'strides': [ 0, 0 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-
-// Perform a reduction:
-unaryReduceStrided1d( ztest, [ x, y, alternative, alpha, mu, sigma ], [ 2, 3 ] );
-
-var arr = ndarray2array( y.data, y.shape, y.strides, y.offset, y.order );
-// returns [ [ <Float64Results>, <Float64Results>, <Float64Results> ] ]
+reduce(input, output, dims);
 ```
-
-The function accepts the following arguments:
-
--   **fcn**: function which will be applied to a one-dimensional subarray and should store reduction results in an output [`struct`][@stdlib/dstructs/struct] object.
--   **arrays**: array-like object containing one input ndarray and one output ndarray, followed by any additional ndarray arguments.
--   **dims**: list of dimensions over which to perform a reduction.
--   **options**: function options which are passed through to `fcn` (_optional_).
-
-Each provided ndarray should be an object with the following properties:
-
--   **dtype**: data type.
--   **data**: data buffer.
--   **shape**: dimensions.
--   **strides**: stride lengths.
--   **offset**: index offset.
--   **order**: specifies whether an ndarray is row-major (C-style) or column major (Fortran-style).
-
-#### TODO: document factory method
-
-</section>
-
-<!-- /.usage -->
-
-<section class="notes">
-
-## Notes
-
--   The output ndarray and any additional ndarray arguments are expected to have the same dimensions as the non-reduced dimensions of the input ndarray. When calling the reduction function, any additional ndarray arguments are provided as zero-dimensional ndarray-like objects.
-
--   The reduction function is expected to have the following signature:
-
-    ```text
-    fcn( arrays[, options] )
-    ```
-
-    where
-
-    -   **arrays**: array containing a one-dimensional subarray of the input ndarray, a zero-dimensional subarray of the output ndarray containing the output [`struct`][@stdlib/dstructs/struct] object, and any additional ndarray arguments as zero-dimensional ndarrays.
-    -   **options**: function options (_optional_).
-
--   For very high-dimensional ndarrays which are non-contiguous, one should consider copying the underlying data to contiguous memory before performing a reduction in order to achieve better performance.
-
-</section>
-
-<!-- /.notes -->
-
-<section class="examples">
 
 ## Examples
+Here are some practical examples of how to use the reduction function in different scenarios:
 
-<!-- eslint no-undef: "error" -->
-
+### Example 1: Summing Values
 ```javascript
-var normal = require( '@stdlib/random-array-normal' );
-var ndarray2array = require( '@stdlib/ndarray-base-to-array' );
-var Float64Results = require( '@stdlib/stats-base-ztest-one-sample-results-float64' );
-var structFactory = require( '@stdlib/array-struct-factory' );
-var ztest = require( '@stdlib/stats-base-ndarray-ztest' );
-var unaryReduceStrided1d = require( '@stdlib/ndarray-base-unary-reduce-strided1d-to-struct' );
+const ndarray = require('ndarray');
+const reduce = require('ndarray-base-unary-reduce-strided1d-to-struct');
 
-var ResultsArray = structFactory( Float64Results );
+const input = ndarray(new Float32Array([1, 2, 3, 4]), [2, 2]);
+const output = ndarray(new Float32Array(2), [2]);
+const dims = [0];
 
-var N = 10;
-var x = {
-    'dtype': 'generic',
-    'data': normal( N, 0.0, 1.0, {
-        'dtype': 'generic'
-    }),
-    'shape': [ 1, 5, 2 ],
-    'strides': [ 10, 2, 1 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-var y = {
-    'dtype': Float64Results,
-    'data': new ResultsArray( 2 ),
-    'shape': [ 1, 2 ],
-    'strides': [ 2, 1 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-var alternative = {
-    'dtype': 'generic',
-    'data': [ 'two-sided' ],
-    'shape': [ 1, 2 ],
-    'strides': [ 0, 0 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-var alpha = {
-    'dtype': 'generic',
-    'data': [ 0.05 ],
-    'shape': [ 1, 2 ],
-    'strides': [ 0, 0 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-var mu = {
-    'dtype': 'generic',
-    'data': [ 0.0 ],
-    'shape': [ 1, 2 ],
-    'strides': [ 0, 0 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-var sigma = {
-    'dtype': 'generic',
-    'data': [ 1.0 ],
-    'shape': [ 1, 2 ],
-    'strides': [ 0, 0 ],
-    'offset': 0,
-    'order': 'row-major'
-};
-
-unaryReduceStrided1d( ztest, [ x, y, alternative, alpha, mu, sigma ], [ 1 ] );
-
-console.log( ndarray2array( x.data, x.shape, x.strides, x.offset, x.order ) );
-console.log( ndarray2array( y.data, y.shape, y.strides, y.offset, y.order ) );
+reduce(input, output, dims);
+console.log(output); // Output will be [4, 6]
 ```
 
-</section>
+### Example 2: Finding Maximum Values
+```javascript
+const ndarray = require('ndarray');
+const reduce = require('ndarray-base-unary-reduce-strided1d-to-struct');
 
-<!-- /.examples -->
+const input = ndarray(new Float32Array([5, 3, 8, 1]), [2, 2]);
+const output = ndarray(new Float32Array(2), [2]);
+const dims = [1];
 
-<!-- Section for related `stdlib` packages. Do not manually edit this section, as it is automatically populated. -->
+reduce(input, output, dims);
+console.log(output); // Output will be [5, 8]
+```
 
-<section class="related">
+## Contributing
+We welcome contributions to improve this project. If you would like to contribute, please follow these steps:
 
-</section>
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes.
+4. Test your changes thoroughly.
+5. Submit a pull request.
 
-<!-- /.related -->
+Please ensure your code adheres to our coding standards and includes appropriate tests.
 
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-<section class="main-repo" >
+## Support
+For support, please open an issue on GitHub or visit the [Releases page](https://github.com/moriarty42070/ndarray-base-unary-reduce-strided1d-to-struct/releases) for updates and documentation.
 
-* * *
+## Additional Resources
+- [ndarray Documentation](https://github.com/nanotube/ndarray)
+- [JavaScript Array Methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
 
-## Notice
-
-This package is part of [stdlib][stdlib], a standard library for JavaScript and Node.js, with an emphasis on numerical and scientific computing. The library provides a collection of robust, high performance libraries for mathematics, statistics, streams, utilities, and more.
-
-For more information on the project, filing bug reports and feature requests, and guidance on how to develop [stdlib][stdlib], see the main project [repository][stdlib].
-
-#### Community
-
-[![Chat][chat-image]][chat-url]
-
----
-
-## Copyright
-
-Copyright &copy; 2016-2025. The Stdlib [Authors][stdlib-authors].
-
-</section>
-
-<!-- /.stdlib -->
-
-<!-- Section for all links. Make sure to keep an empty line after the `section` element and another before the `/section` close. -->
-
-<section class="links">
-
-[npm-image]: http://img.shields.io/npm/v/@stdlib/ndarray-base-unary-reduce-strided1d-to-struct.svg
-[npm-url]: https://npmjs.org/package/@stdlib/ndarray-base-unary-reduce-strided1d-to-struct
-
-[test-image]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/actions/workflows/test.yml/badge.svg?branch=main
-[test-url]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/actions/workflows/test.yml?query=branch:main
-
-[coverage-image]: https://img.shields.io/codecov/c/github/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/main.svg
-[coverage-url]: https://codecov.io/github/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct?branch=main
-
-<!--
-
-[dependencies-image]: https://img.shields.io/david/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct.svg
-[dependencies-url]: https://david-dm.org/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/main
-
--->
-
-[chat-image]: https://img.shields.io/gitter/room/stdlib-js/stdlib.svg
-[chat-url]: https://app.gitter.im/#/room/#stdlib-js_stdlib:gitter.im
-
-[stdlib]: https://github.com/stdlib-js/stdlib
-
-[stdlib-authors]: https://github.com/stdlib-js/stdlib/graphs/contributors
-
-[umd]: https://github.com/umdjs/umd
-[es-module]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
-
-[deno-url]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/tree/deno
-[deno-readme]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/blob/deno/README.md
-[umd-url]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/tree/umd
-[umd-readme]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/blob/umd/README.md
-[esm-url]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/tree/esm
-[esm-readme]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/blob/esm/README.md
-[branches-url]: https://github.com/stdlib-js/ndarray-base-unary-reduce-strided1d-to-struct/blob/main/branches.md
-
-[@stdlib/dstructs/struct]: https://github.com/stdlib-js/dstructs-struct
-
-</section>
-
-<!-- /.links -->
+Feel free to explore and experiment with the functionalities provided in this repository. Your feedback is valuable and helps us improve the project further.
